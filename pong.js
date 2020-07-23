@@ -75,14 +75,17 @@ class Paddle {
   * @param float size_x - width
   * @param float size_y - height
   * @param float speed - movement speed
+  * @param int delay_ms - time to wait for ball launch after reset
 */
 class Ball {
-	constructor(size_x, size_y, speed) {
+	constructor(size_x, size_y, speed, delay_ms) {
 		this.init = createVector(width / 2 - size_x / 2, height /2 - size_y /2);
 		this.size = createVector(size_x, size_y);
 		// tracks player score
 		this.score = [0, 0];
 		this.speed = speed;
+		this.delay_ms = delay_ms;
+		this.delay_counter = 0;
 		this.position = createVector(0, 0);
 		this.velocity = createVector(0, 0);
 		this.center = createVector(0, 0);
@@ -98,6 +101,7 @@ class Ball {
 				this.score[0] += 1;
 		}
 
+		this.delay_counter = 0;
 		this.position.set(this.init.x, this.init.y);
 		// Set ball velocity to random trajectory
 		this.velocity.set(random([this.speed, -this.speed]), random(this.speed * 1.5, -this.speed * 1.5));
@@ -112,14 +116,14 @@ class Ball {
 		// Explicitly set a passed direction for x to ensure we don't get stuck 
 		// inside a paddle. Set y based on current velocity plus a nudge from our scaler
 		this.velocity.set(this.speed * direction,
-						  this.velocity.y + this.speed * 0.3 * scaler);
+						  this.velocity.y + this.speed * 0.15 * scaler);
 	}
 
 	update() {
 		// Update center based on current position
 		this.center.set(this.position.x + this.size.x / 2, 
 						this.position.y + this.size.y / 2);
-
+		this.delay_counter += deltaTime;
 		// hitting top wall
 		if (this.position.y < 0) {
 			// explicitly move ball out of check zone so we don't get stuck in the wall
@@ -141,9 +145,11 @@ class Ball {
 		else if (!colliding(this.position, this.size, createVector(0, 0), createVector(width, height)))
 			this.reset_ball(false);
 
-		// update position basedo on velocity
-		this.position.set(this.position.x + this.velocity.x * (deltaTime / (1/speed)),
-						  this.position.y + this.velocity.y * (deltaTime / (1/speed)));
+		if (this.delay_counter >= this.delay_ms) {
+			// update position basedo on velocity
+			this.position.set(this.position.x + this.velocity.x * (deltaTime / (1/speed)),
+							  this.position.y + this.velocity.y * (deltaTime / (1/speed)));
+		}
 	}
 
 	draw() {
@@ -169,10 +175,10 @@ function setup() {
   createCanvas(480, 320);
   
   pad1 = new Paddle(20, 60, 10, 50, 1, 10);
-  pad2 = new Paddle(width - 20 - 10, 60, 10, 50, 1, 5);
-  ball = new Ball(10, 10, 1);
+  pad2 = new Paddle(width - 20 - 10, 60, 10, 50, 1.005, 10);
+  ball = new Ball(10, 10, 1.05, 450);
 
-  speed = 0.1;
+  speed = 0.15;
   mouseVect = createVector(mouseX, mouseY);
   stroke(255);
   fill(255);
@@ -196,9 +202,9 @@ function draw() {
 
 	// draw center dotted line
 	strokeWeight(4);
-	for(let y = 0; y < height; y+=20)
+	for(let y = 0; y < height; y+=15)
 		if (y % 2 == 0)
-			line(width / 2 - 2, y, width / 2 - 2, y + 10);
+			line(width / 2, y, width / 2, y + 15);
 	strokeWeight(0);
 
 	// draw each player score
