@@ -193,7 +193,7 @@ function draw() {
 	// pad2 will follow ball
 	pad2.update(ball.center);
 	update();
-	
+
 	// draw center dotted line
 	strokeWeight(4);
 	for(let y = 0; y < height; y+=20)
@@ -212,6 +212,8 @@ function draw() {
 
 // Mostly collision
 function update() {
+	// Calculate some smaller face rects for collision checks to stop collision happening
+	// when the ball touches the back portion of a paddle.
 	let pad1_face_pos = createVector(pad1.position.x + pad1.size.x - 2, pad1.position.y);
 	let pad1_face_size = createVector(2,pad1.size.y);
 	let pad2_face_size = createVector(2,pad2.size.y);
