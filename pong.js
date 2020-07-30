@@ -158,6 +158,7 @@ class Ball {
 }
 
 
+let DEBUG = 1;
 let speed;
 let mouseVect;
 
@@ -166,7 +167,6 @@ let pad2;
 let ball;
 
 let font;
-
 function preload() {
 	font = loadFont('Pixeled.ttf');
 }
@@ -185,6 +185,17 @@ function setup() {
   textFont(font);
   textAlign(CENTER);
   textSize(32);
+}
+
+function keyPressed() {
+	if (DEBUG > 0) {
+		if (key === '1')
+			ball.score[0] += 5;
+		else if (key === '2')
+			ball.score[0] -= 5;
+		else if (key === '3')
+			ball.score = [0, 0];
+	}
 }
 
 function draw() {
@@ -207,9 +218,11 @@ function draw() {
 			line(width / 2, y, width / 2, y + 15);
 	strokeWeight(0);
 
-	// draw each player score
-	text(ball.score[0], width * 0.25, 50);
-	text(ball.score[1], width * 0.75, 50);
+	// draw each player score, clip to 99 and add leading 0 if less than 10
+	score = ball.score[0].clip(0, 99);
+	text(score >= 10 ? score : "0" + str(score), width * 0.25, 50);
+	score = ball.score[1].clip(0, 99);
+	text(score >= 10 ? score : "0" + str(score), width * 0.75, 50);
 
 	ball.draw();
 	pad1.draw();
