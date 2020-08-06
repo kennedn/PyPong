@@ -168,7 +168,7 @@ let ball;
 
 let font;
 function preload() {
-	font = loadFont('Pixeled.ttf');
+	font = loadFont('asset/Ubuntu-B.ttf');
 }
 
 function setup() {
@@ -213,9 +213,8 @@ function draw() {
 
 	// draw center dotted line
 	strokeWeight(4);
-	for(let y = 0; y < height; y+=15)
-		if (y % 2 == 0)
-			line(width / 2, y, width / 2, y + 15);
+	for(let y = 4; y < height; y+=20)
+	  line(width / 2, y, width / 2, y + 12);
 	strokeWeight(0);
 
 	// draw each player score, clip to 99 and add leading 0 if less than 10
@@ -235,6 +234,7 @@ function update() {
 	// when the ball touches the back portion of a paddle.
 	let pad1_face_pos = createVector(pad1.position.x + pad1.size.x - 2, pad1.position.y);
 	let pad1_face_size = createVector(2,pad1.size.y);
+  //pad2_pos already satifies the x/y for a face rect
 	let pad2_face_size = createVector(2,pad2.size.y);
 	// if ball and pad1 are colliding
 	if (colliding(ball.position, ball.size, pad1_face_pos, pad1_face_size))
