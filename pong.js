@@ -158,9 +158,10 @@ class Ball {
 }
 
 
-let DEBUG = 1;
+let DEBUG = 0;
 let speed;
 let mouseVect;
+let lastClick;
 
 let pad1;
 let pad2;
@@ -168,18 +169,19 @@ let ball;
 
 let font;
 function preload() {
-	font = loadFont('asset/Ubuntu-B.ttf');
+	font = loadFont('font/Ubuntu-B.ttf');
 }
 
 function setup() {
   createCanvas(480, 320);
   
-  pad1 = new Paddle(20, 60, 10, 50, 1, 10);
-  pad2 = new Paddle(width - 20 - 10, 60, 10, 50, 1.005, 10);
+  pad1 = new Paddle(20, height /2 - 25, 10, 50, 1, 10);
+  pad2 = new Paddle(width - 20 - 10, height /2 - 25, 10, 50, 1.005, 10);
   ball = new Ball(10, 10, 1.05, 450);
 
   speed = 0.15;
   mouseVect = createVector(mouseX, mouseY);
+  lastClicked = createVector(-1, -1);
   stroke(255);
   fill(255);
   textFont(font);
@@ -187,6 +189,7 @@ function setup() {
   textSize(32);
 }
 
+// Monitor for some keypresses for debug functionality
 function keyPressed() {
 	if (DEBUG > 0) {
 		if (key === '1')
@@ -198,34 +201,55 @@ function keyPressed() {
 	}
 }
 
+// Track coords of last click event
+function mouseClicked() {
+  lastClicked.set(mouseX, mouseY);
+}
+
 function draw() {
-	// fill screen
-	background(0);
-	// store current mouse vector
-	mouseVect.set(mouseX, mouseY);
-	
-	ball.update();
-	// pad1 will follow mouse
-	pad1.update(mouseVect);
-	// pad2 will follow ball
-	pad2.update(ball.center);
-	update();
+  // fill screen
+  background(0);
 
-	// draw center dotted line
-	strokeWeight(4);
-	for(let y = 4; y < height; y+=20)
-	  line(width / 2, y, width / 2, y + 12);
-	strokeWeight(0);
+  // draw center dotted line
+  strokeWeight(4);
+  for(let y = 4; y < height; y+=20)
+    line(width / 2, y, width / 2, y + 12);
+  strokeWeight(0);
 
-	// draw each player score, clip to 99 and add leading 0 if less than 10
-	score = ball.score[0].clip(0, 99);
-	text(score >= 10 ? score : "0" + str(score), width * 0.25, 50);
-	score = ball.score[1].clip(0, 99);
-	text(score >= 10 ? score : "0" + str(score), width * 0.75, 50);
+  // draw each player score, clip to 99 and add leading 0 if less than 10
+  score = ball.score[0].clip(0, 99);
+  text(score >= 10 ? score : "0" + str(score), width * 0.25, 50);
+  score = ball.score[1].clip(0, 99);
+  text(score >= 10 ? score : "0" + str(score), width * 0.75, 50);
 
+  // draw elements
 	ball.draw();
 	pad1.draw();
 	pad2.draw();
+
+
+  // Only update elements if the last click event was inside the canvas (unpause)
+  if (colliding(createVector(0, 0), createVector(width, height), lastClicked, createVector(1,1))) {
+    // store current mouse vector
+    mouseVect.set(mouseX, mouseY);
+    // process ball movement  
+    ball.update();
+    // pad1 will follow mouse
+    pad1.update(mouseVect);
+    // pad2 will follow ball
+    pad2.update(ball.center);
+    // Misc updates
+    update();
+  }
+  // Print message if last click was outside the canvas
+  else {
+    let pauseString = 'Click to play';
+    fill(0);
+    rect(width /2 - textWidth(pauseString) / 2, height / 2  - textSize()/1.75, textWidth(pauseString), textSize());
+    fill(255);
+    text(pauseString, width / 2, height / 2 + textSize() / 4);
+  }
+
 }
 
 // Mostly collision
