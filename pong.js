@@ -173,11 +173,11 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(480, 320);
+  createCanvas(1920, 1080);
   
-  pad1 = new Paddle(20, height /2 - 25, 10, 50, 1, 10);
-  pad2 = new Paddle(width - 20 - 10, height /2 - 25, 10, 50, 1.005, 10);
-  ball = new Ball(10, 10, 1.05, 450);
+  pad1 = new Paddle(80, height /2 - 100, 40, 200, 4, 40);
+  pad2 = new Paddle(width - 80 - 40, height /2 - 100, 40, 200, 4, 40);
+  ball = new Ball(40, 40, 4.2, 450);
 
   speed = 0.15;
   mouseVect = createVector(mouseX, mouseY);
@@ -186,7 +186,7 @@ function setup() {
   fill(255);
   textFont(font);
   textAlign(CENTER);
-  textSize(32);
+  textSize(120);
 }
 
 // Monitor for some keypresses for debug functionality
@@ -208,19 +208,20 @@ function mouseClicked() {
 
 function draw() {
   // fill screen
-  background(0);
+  background('#1c817e');
+  //background(0);
 
   // draw center dotted line
-  strokeWeight(4);
-  for(let y = 4; y < height; y+=20)
-    line(width / 2, y, width / 2, y + 12);
+  strokeWeight(16);
+  for(let y = 4; y < height; y+=80)
+    line(width / 2, y, width / 2, y + 40);
   strokeWeight(0);
 
   // draw each player score, clip to 99 and add leading 0 if less than 10
   score = ball.score[0].clip(0, 99);
-  text(score >= 10 ? score : "0" + str(score), width * 0.25, 50);
+  text(score >= 10 ? score : "0" + str(score), width * 0.25, 150);
   score = ball.score[1].clip(0, 99);
-  text(score >= 10 ? score : "0" + str(score), width * 0.75, 50);
+  text(score >= 10 ? score : "0" + str(score), width * 0.75, 150);
 
   // draw elements
 	ball.draw();
@@ -244,7 +245,7 @@ function draw() {
   // Print message if last click was outside the canvas
   else {
     let pauseString = 'Click to play';
-    fill(0);
+    fill('#1c817e');
     rect(width /2 - textWidth(pauseString) / 2, height / 2  - textSize()/1.75, textWidth(pauseString), textSize());
     fill(255);
     text(pauseString, width / 2, height / 2 + textSize() / 4);
