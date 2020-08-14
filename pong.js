@@ -104,19 +104,15 @@ class Ball {
 		this.delay_counter = 0;
 		this.position.set(this.init.x, this.init.y);
 		// Set ball velocity to random trajectory
-		this.velocity.set(random([this.speed, -this.speed]), random(this.speed * 1.5, -this.speed * 1.5));
+		this.velocity.set(random([this.speed, -this.speed]), random(this.speed, -this.speed));
 	}
 
 	// Helper class for switching ball velocity upon hitting a paddle
-	paddle_strike(direction, pad_center_y) {
-		// Determine a scaler value, roughly between -0.2 and -1 based on
-		// distance from center of pad
-		let scaler = -(1 + pad_center_y - this.center.y) / (this.size.y / 2);
-
-		// Explicitly set a passed direction for x to ensure we don't get stuck 
-		// inside a paddle. Set y based on current velocity plus a nudge from our scaler
-		this.velocity.set(this.speed * direction,
-						  this.velocity.y + this.speed * 0.15 * scaler);
+	paddle_strike(direction, pad_velocity_x) {
+		// Speed up ball if pad was moving when it made contact
+		this.velocity.set(direction * (Math.abs(this.velocity.x) + Math.abs(pad_velocity_x) * 0.1), 
+						  (this.velocity.y > 0) ? this.velocity.y + Math.abs(pad_velocity_x) * 0.03 :
+						  						  this.velocity.y - Math.abs(pad_velocity_x) * 0.03);
 	}
 
 	update() {
@@ -154,11 +150,17 @@ class Ball {
 
 	draw() {
 		rect(this.position.x, this.position.y, this.size.x, this.size.y);
+		if (DEBUG >= 2) {
+			let temp_size = textSize();
+			textSize(20);
+			text("x: " + this.velocity.x + ", y: " + this.velocity.y, width * 0.25, height - 40);
+			textSize(temp_size);
+		}
 	}
 }
 
 
-let DEBUG = 0;
+let DEBUG = 2;
 let speed;
 let mouseVect;
 let lastClick;
@@ -177,12 +179,13 @@ function setup() {
   
   pad1 = new Paddle(80, height /2 - 100, 40, 200, 4, 40);
   pad2 = new Paddle(width - 80 - 40, height /2 - 100, 40, 200, 4, 40);
-  ball = new Ball(40, 40, 4.2, 450);
+  ball = new Ball(40, 40, 4.1, 450);
 
   speed = 0.15;
   mouseVect = createVector(mouseX, mouseY);
   lastClicked = createVector(-1, -1);
   stroke(255);
+  strokeCap(SQUARE);
   fill(255);
   textFont(font);
   textAlign(CENTER);
@@ -213,8 +216,8 @@ function draw() {
 
   // draw center dotted line
   strokeWeight(16);
-  for(let y = 4; y < height; y+=80)
-    line(width / 2, y, width / 2, y + 40);
+  for(let y = 8; y + 65 < height; y+=90)
+    line(width / 2, y, width / 2, y + 65);
   strokeWeight(0);
 
   // draw each player score, clip to 99 and add leading 0 if less than 10
@@ -264,10 +267,10 @@ function update() {
 	// if ball and pad1 are colliding
 	if (colliding(ball.position, ball.size, pad1_face_pos, pad1_face_size))
 		// inform ball class of the strike so it can adjust velocity accordingly
-		ball.paddle_strike(1, pad1.center.y);
+		ball.paddle_strike(1, pad1.velocity.y);
 	// if ball and pad2 are colliding
 	else if (colliding(ball.position, ball.size, pad2.position, pad2_face_size))
 		// inform ball class of the strike so it can adjust velocity accordingly
-		ball.paddle_strike(-1, pad2.center.y);
+		ball.paddle_strike(-1, pad2.velocity.y);
 }
 
