@@ -89,6 +89,7 @@ class Ball {
 		this.position = createVector(0, 0);
 		this.velocity = createVector(0, 0);
 		this.center = createVector(0, 0);
+		this.angle = 0;
 		this.reset_ball(false);
 	}
 	// resets ball to center screen with a random velocity
@@ -112,7 +113,7 @@ class Ball {
 		// Speed up ball if pad was moving when it made contact
 		this.velocity.set(direction * (Math.abs(this.velocity.x) + Math.abs(pad_velocity_x) * 0.1), 
 						  (this.velocity.y > 0) ? this.velocity.y + Math.abs(pad_velocity_x) * 0.03 :
-						  						  this.velocity.y - Math.abs(pad_velocity_x) * 0.03);
+						  						  this.velocity.y - Math.abs(pad_velocity_x) * 0.06);
 	}
 
 	update() {
@@ -160,7 +161,7 @@ class Ball {
 }
 
 
-let DEBUG = 2;
+let DEBUG = 0;
 let speed;
 let mouseVect;
 let lastClick;
@@ -178,7 +179,7 @@ function setup() {
   createCanvas(1920, 1080);
   
   pad1 = new Paddle(80, height /2 - 100, 40, 200, 4, 40);
-  pad2 = new Paddle(width - 80 - 40, height /2 - 100, 40, 200, 4, 40);
+  pad2 = new Paddle(width - 80 - 40, height /2 - 100, 40, 200, 3.8, 40);
   ball = new Ball(40, 40, 4.1, 450);
 
   speed = 0.15;
