@@ -105,7 +105,8 @@ class Ball {
 		this.delay_counter = 0;
 		this.position.set(this.init.x, this.init.y);
 		// Set ball velocity to random trajectory
-		this.velocity.set(random([this.speed, -this.speed]), random(this.speed, -this.speed));
+		let ySpeed = random([1, -1]) * random(1, this.speed);
+		this.velocity.set(random([this.speed, -this.speed]), ySpeed);
 	}
 
 	// Helper class for switching ball velocity upon hitting a paddle
@@ -164,7 +165,7 @@ class Ball {
 let DEBUG = 0;
 let speed;
 let mouseVect;
-let lastClick;
+let paused;
 
 let pad1;
 let pad2;
@@ -176,15 +177,15 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(1920, 1080);
+  createCanvas(1620, 1080);
   
-  pad1 = new Paddle(80, height /2 - 100, 40, 200, 4, 40);
-  pad2 = new Paddle(width - 80 - 40, height /2 - 100, 40, 200, 3.8, 40);
-  ball = new Ball(40, 40, 4.1, 450);
+  pad1 = new Paddle(60, height /2 - 100, 30, 150, 4, 40);
+  pad2 = new Paddle(width - 60 - 30, height /2 - 100, 30, 150, 3.4, 40);
+  ball = new Ball(30, 30, 4.1, 450);
 
-  speed = 0.15;
+  speed = 0.2;
   mouseVect = createVector(mouseX, mouseY);
-  lastClicked = createVector(-1, -1);
+  paused = false;
   stroke(255);
   strokeCap(SQUARE);
   fill(255);
@@ -203,11 +204,15 @@ function keyPressed() {
 		else if (key === '3')
 			ball.score = [0, 0];
 	}
+	if (key == 'p')
+		paused = !paused;
+
 }
 
 // Track coords of last click event
-function mouseClicked() {
-  lastClicked.set(mouseX, mouseY);
+function doubleClicked() {
+  if (colliding(createVector(0, 0), createVector(width, height), createVector(mouseX, mouseY), createVector(1,1)))
+  	paused = !paused;
 }
 
 function draw() {
@@ -216,7 +221,7 @@ function draw() {
   //background(0);
 
   // draw center dotted line
-  strokeWeight(16);
+  strokeWeight(13);
   for(let y = 8; y + 65 < height; y+=90)
     line(width / 2, y, width / 2, y + 65);
   strokeWeight(0);
@@ -234,7 +239,7 @@ function draw() {
 
 
   // Only update elements if the last click event was inside the canvas (unpause)
-  if (colliding(createVector(0, 0), createVector(width, height), lastClicked, createVector(1,1))) {
+  if (paused) {
     // store current mouse vector
     mouseVect.set(mouseX, mouseY);
     // process ball movement  
@@ -248,7 +253,7 @@ function draw() {
   }
   // Print message if last click was outside the canvas
   else {
-    let pauseString = 'Click to play';
+    let pauseString = 'double click to play';
     fill('#1c817e');
     rect(width /2 - textWidth(pauseString) / 2, height / 2  - textSize()/1.75, textWidth(pauseString), textSize());
     fill(255);
