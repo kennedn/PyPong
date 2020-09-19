@@ -166,6 +166,7 @@ let DEBUG = 0;
 let speed;
 let mouseVect;
 let paused;
+let lastVect;
 
 let pad1;
 let pad2;
@@ -181,7 +182,7 @@ function setup() {
   
   pad1 = new Paddle(60, height /2 - 100, 30, 150, 4, 40);
   pad2 = new Paddle(width - 60 - 30, height /2 - 100, 30, 150, 3.4, 40);
-  ball = new Ball(30, 30, 4.1, 450);
+  ball = new Ball(35, 35, 4.1, 450);
 
   speed = 0.2;
   mouseVect = createVector(mouseX, mouseY);
@@ -192,6 +193,7 @@ function setup() {
   textFont(font);
   textAlign(CENTER);
   textSize(120);
+  frameRate(60);
 }
 
 // Monitor for some keypresses for debug functionality
@@ -259,6 +261,12 @@ function draw() {
     fill(255);
     text(pauseString, width / 2, height / 2 + textSize() / 4);
   }
+if (DEBUG >= 1) {
+	let temp_size = textSize();
+	textSize(30);
+	text("fps: " + Math.round(frameRate()), width * 0.25, height - 40);
+	textSize(temp_size);
+}
 
 }
 
@@ -266,16 +274,22 @@ function draw() {
 function update() {
 	// Calculate some smaller face rects for collision checks to stop collision happening
 	// when the ball touches the back portion of a paddle.
-	let pad1_face_pos = createVector(pad1.position.x + pad1.size.x - 2, pad1.position.y);
-	let pad1_face_size = createVector(2,pad1.size.y);
-  //pad2_pos already satifies the x/y for a face rect
-	let pad2_face_size = createVector(2,pad2.size.y);
+	// let pad1_face_pos = createVector(pad1.position.x, pad1.position.y);
+	// let pad1_face_size = createVector(pad1.size.x, pad1.size.y);
+ //  //pad2_pos already satifies the x/y for a face rect
+	// let pad2_face_size = createVector(pad2.size.x, pad2.size.y);
 	// if ball and pad1 are colliding
-	if (colliding(ball.position, ball.size, pad1_face_pos, pad1_face_size))
+	if (DEBUG >= 1) {
+		fill(255,0,0);
+		rect(pad1.position.x, pad1.position.y, pad1.size.x, pad1.size.y);
+		rect(pad2.position.x, pad2.position.y, pad2.size.x, pad2.size.y);
+		fill(255);
+	}
+	if (colliding(ball.position, ball.size, pad1.position, pad1.size))
 		// inform ball class of the strike so it can adjust velocity accordingly
 		ball.paddle_strike(1, pad1.velocity.y);
 	// if ball and pad2 are colliding
-	else if (colliding(ball.position, ball.size, pad2.position, pad2_face_size))
+	else if (colliding(ball.position, ball.size, pad2.position, pad2.size))
 		// inform ball class of the strike so it can adjust velocity accordingly
 		ball.paddle_strike(-1, pad2.velocity.y);
 }
