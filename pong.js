@@ -253,6 +253,8 @@ function draw() {
   }
   // Print message if last click was outside the canvas
   else {
+	if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent))
+		playing = true;
     let pauseString = 'Tap to start playing';
     fill('#1c817e');
     rect(width /2 - textWidth(pauseString) / 2, height / 2  - textSize()/1.75, textWidth(pauseString), textSize());
