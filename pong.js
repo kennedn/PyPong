@@ -165,7 +165,7 @@ class Ball {
 let DEBUG = 0;
 let speed;
 let mouseVect;
-let paused;
+let playing;
 let lastVect;
 
 let pad1;
@@ -186,7 +186,7 @@ function setup() {
 
   speed = 0.2;
   mouseVect = createVector(mouseX, mouseY);
-  paused = false;
+  playing = false;
   stroke(255);
   strokeCap(SQUARE);
   fill(255);
@@ -206,15 +206,12 @@ function keyPressed() {
 		else if (key === '3')
 			ball.score = [0, 0];
 	}
-	if (key == 'p')
-		paused = !paused;
-
 }
 
 // Track coords of last click event
-function doubleClicked() {
+function mouseClicked() {
   if (colliding(createVector(0, 0), createVector(width, height), createVector(mouseX, mouseY), createVector(1,1)))
-  	paused = !paused;
+  	playing = true;
 }
 
 function draw() {
@@ -241,7 +238,7 @@ function draw() {
 
 
   // Only update elements if the last click event was inside the canvas (unpause)
-  if (paused) {
+  if (playing) {
 
     // store current mouse vector
     mouseVect.set(mouseX, mouseY);
@@ -256,9 +253,7 @@ function draw() {
   }
   // Print message if last click was outside the canvas
   else {
-	if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent))
-		paused = true;
-    let pauseString = 'Double tap to play';
+    let pauseString = 'Tap to start playing';
     fill('#1c817e');
     rect(width /2 - textWidth(pauseString) / 2, height / 2  - textSize()/1.75, textWidth(pauseString), textSize());
     fill(255);
@@ -275,13 +270,6 @@ if (DEBUG >= 1) {
 
 // Mostly collision
 function update() {
-	// Calculate some smaller face rects for collision checks to stop collision happening
-	// when the ball touches the back portion of a paddle.
-	// let pad1_face_pos = createVector(pad1.position.x, pad1.position.y);
-	// let pad1_face_size = createVector(pad1.size.x, pad1.size.y);
- //  //pad2_pos already satifies the x/y for a face rect
-	// let pad2_face_size = createVector(pad2.size.x, pad2.size.y);
-	// if ball and pad1 are colliding
 	if (DEBUG >= 1) {
 		fill(255,0,0);
 		rect(pad1.position.x, pad1.position.y, pad1.size.x, pad1.size.y);
